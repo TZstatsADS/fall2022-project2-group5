@@ -1,0 +1,113 @@
+---
+title: "Project2_heatmap"
+author: "Xinyun Li"
+date: "2022-10-11"
+output: html_document
+---
+
+```{r warning=FALSE}
+if (!require("DT")) install.packages('DT')
+if (!require("dtplyr")) install.packages('dtplyr')
+if (!require("lubridate")) install.packages('lubridate')
+if (!require("ggmap")) install.packages('ggmap')
+if (!require("choroplethrZip")) {
+  install.packages("devtools")
+  library(devtools)
+  install_github('arilamstein/choroplethrZip@v1.5.0')}
+```
+```{R}
+library(dtplyr)
+library(dplyr)
+library(stringr)
+library(tidyr)
+```
+
+```{R}
+if (!require("shiny")) install.packages("shiny")
+library(shiny)
+```
+
+```{R}
+setwd("~/Desktop/project2/data")
+eviction <- read.csv("eviction_clean.csv")
+zip_lat_lon <- read.csv("uszips.csv")
+head(eviction)
+head(zip_lat_lon)
+```
+
+```{R}
+eviction = eviction%>%filter(Eviction.Postcode>0)%>%
+  mutate(region  = as.character(Eviction.Postcode))%>%
+  mutate(LAT = zip_lat_lon$lat[match(eviction$Eviction.Postcode,zip_lat_lon$zip)])%>%
+  mutate(LON = zip_lat_lon$lng[match(eviction$Eviction.Postcode,zip_lat_lon$zip)])%>%
+  select(-c("Longitude","Eviction.Postcode","Latitude"))%>%
+  select(dtm,everything())%>%
+  drop_na()
+```
+
+```{R}
+zip_info <- eviction%>%select(region,LAT,LON)
+zip_info <- zip_info[!duplicated(zip_info$region),]
+```
+
+
+
+
+```{R}
+write.csv(eviction,"/Users/lixinyun/Desktop/project2/output/eviction_df.csv", row.names = FALSE)
+write.csv(zip_info,"/Users/lixinyun/Desktop/project2/output/zip_info.csv", row.names = FALSE)
+```
+
+```{R}
+residential_count <- eviction%>%
+  filter(Residential.Commercial =="Residential")%>%
+  group_by(region)%>%
+  summarise(value = n())
+write.csv(residential_count,"/Users/lixinyun/Desktop/project2/output/residential_count.csv", row.names = FALSE)
+commercial_count <- eviction%>%filter(Residential.Commercial =="Commercial")%>%
+  group_by(region)%>%
+  summarise(value = n())
+write.csv(commercial_count,"/Users/lixinyun/Desktop/project2/output/commercial_count.csv", row.names = FALSE)
+```
+
+
+```{R}
+install.packages("rlang")
+devtools::install_github('arilamstein/choroplethrZip@v1.5.0')
+devtools::install_github("hadley/ggplot2")
+devtools::install_github("dkahle/ggmap")
+```
+
+```{R warning=FALSE}
+library(devtools)
+library(choroplethrZip)
+library(ggmap)
+```
+
+
+```{R message=FALSE, warning=FALSE}
+zip_choropleth(commercial_count,title = "2017-2022 Commerical Property Evictions",
+               legend = "number of evictions",
+               county_zoom = c(36005,36047,36061,36081,36085))
+```
+
+
+```{R warning=FALSE}
+zip_choropleth(residential_count,title = "2017-2022 Commerical Property Evictions",
+               legend = "number of evictions",
+               county_zoom = c(36005,36047,36061,36081,36085))
+
+```
+
+```{R warning=FALSE}
+register_google(
+key = "AIzaSyDUuivJMvpVAjfgn1m-on0e_5hhJJIQQtk"
+
+)
+
+ggmap(get_map("New York City",source = "google",
+              maptype = "hybrid",
+              zoom = 12, color = "bw"))+
+        geom_point(data = eviction,aes(x =LON, y = LAT),color = "red")
+
+```
