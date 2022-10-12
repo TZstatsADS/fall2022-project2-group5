@@ -26,7 +26,7 @@ Term: Fall 2022
 	+ Li, Jenny
 	+ Li, Xinyun
 
-+ **Project summary**: Drawing data from [NYC Open Data](https://opendata.cityofnewyork.us/data/), our app visualizes the change of numbers of evictions in different boroughs in New York before and throughout the covid period on the map, along with line plots showing the monthly counts of different cases of covid from 2020 to present. 
++ **Project summary**: Drawing data from [NYC Open Data](https://opendata.cityofnewyork.us/data/), our app visualizes the change of numbers of evictions in different boroughs in New York before and after The Tenant Safe Harbor Act throughout the covid period on the map, along with line plots showing the monthly counts of different cases of covid from 2020 to present. 
 
 + **Contribution statement**: ([default](doc/a_note_on_contributions.md)) All team members contributed equally in all stages of this project. All team members approve our work presented in this GitHub repository including this contributions statement. 
 
