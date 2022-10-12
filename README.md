@@ -16,7 +16,7 @@ The **learning goals** for this project is:
 
 *The above general statement about project 2 can be removed once you are finished with your project. It is optional.
 
-## Project Title Covid 19 and Evictions in New York City
+## Project Title: Covid 19 and Evictions in New York City
 Term: Fall 2022
 
 + Team 5
@@ -26,7 +26,7 @@ Term: Fall 2022
 	+ Li, Jenny
 	+ Li, Xinyun
 
-+ **Project summary**: 
++ **Project summary**: Drawing data from [NYC Open Data](https://opendata.cityofnewyork.us/data/), our app shows the change of numbers of evictions in different boroughs in New York throughout the covid period.
 
 + **Contribution statement**: ([default](doc/a_note_on_contributions.md)) All team members contributed equally in all stages of this project. All team members approve our work presented in this GitHub repository including this contributions statement. 
 
