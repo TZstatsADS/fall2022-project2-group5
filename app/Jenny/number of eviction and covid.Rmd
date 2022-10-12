@@ -1,0 +1,116 @@
+---
+title: "shinny2"
+author: "Zhenni (Jenny) Li"
+date: '2022-10-11'
+output: pdf_document
+---
+
+## set global options
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(fig.width=12, fig.height=8, fig.path='figs/',
+                      echo=T, warning=FALSE, message=FALSE)
+```
+
+
+```{r}
+library(dtplyr)
+library(dplyr)
+library(DT)
+library(lubridate)
+```
+
+```{r}
+library(tidyverse)
+library(shiny)
+library(skimr)
+```
+
+
+```{r}
+eviction = read.csv('eviction.csv')
+eviction <- eviction[order(eviction$year, eviction$month),]
+eviction
+```
+
+```{r}
+covid = read.csv('covid.csv')
+covid
+```
+
+
+```{r}
+ui <- fluidPage(
+  # App title ----
+  titlePanel("Number of Evictions and Covid Cases in Each Borough"),
+  # Sidebar layout with input and output definitions ----
+  sidebarLayout(
+    # Sidebar panel for inputs ----
+    sidebarPanel(
+      # Input: Select for the borough ----
+      selectInput(inputId = "borough",
+                  label = "Choose a borough:",
+                  choices = c("MANHATTAN", "BRONX", "BROOKLYN", "QUEENS", "STATEN.ISLAND")),
+      
+      # Input: Select for the year ----
+      selectInput(inputId = "year",
+                  label = "Choose a year:",
+                  choices = c("2017", "2018", "2019", "2020", "2021", "2022"))
+    ),
+    
+    # Main panel for displaying outputs ----
+    mainPanel(
+      # Output:  ----
+      plotOutput(outputId = "tsPlot1"), 
+      plotOutput(outputId = "tsPlot2")
+    )
+  )
+)
+```
+
+
+```{r}
+server <- function(input, output) {
+  data <- reactive({
+    data <- eviction %>% filter(grepl(input$year, year))
+    return(data)
+  })
+  
+ output$tsPlot1 <- renderPlot({
+   data <- data()
+   ggplot() +
+     geom_line(data=data, aes_string(x='month', y=input$borough)) +
+     scale_x_continuous("month", data$month, labels=as.character(data$month), breaks=data$month) + 
+     ylab('monthly number of evictions') +
+     ggtitle(paste("Number of eviction cases in ",  input$borough, " in ", input$year))
+ })
+   
+   
+  data2 <- reactive({
+    data2 <- covid %>% filter(grepl(input$year, year))
+    return(data2)
+    })
+   
+  output$tsPlot2 <- renderPlot({
+    data2 <- data2()
+    
+    if (strtoi(input$year) >= 2020 ){
+      ggplot() +
+        geom_line(data=data2, aes_string(x='month', y=input$borough)) +
+        scale_x_continuous("month", data2$month, labels=as.character(data2$month), breaks=data2$month) + 
+        ylab('monthly number of covid cases') +
+        ggtitle(paste("Number of covid cases in ",  input$borough, " in ", input$year))}
+    else if (strtoi(input$year) < 2020 ){
+      text = "It's pre-covid!"
+      ggplot() +
+        annotate("text", x=4, y=25, size=8, label=text)
+    }
+   })
+ 
+ 
+}
+```
+
+```{r}
+shinyApp(ui, server)
+```
+
